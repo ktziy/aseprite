@@ -92,6 +92,20 @@ jobs:
       shell: bash
       run: |
         cd build && ninja
+
+    # 👇 新增：复制 DLL 依赖
+    - name: Copy DLL dependencies (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        # 复制 OpenSSL DLL
+        cp /c/Program\ Files/OpenSSL-Win64/bin/libcrypto-3-x64.dll build/bin/ 2>/dev/null || true
+        cp /c/Program\ Files/OpenSSL-Win64/bin/libssl-3-x64.dll build/bin/ 2>/dev/null || true
+        # 复制 VC++ 运行时 DLL
+        cp /c/Windows/System32/msvcp140.dll build/bin/ 2>/dev/null || true
+        cp /c/Windows/System32/vcruntime140.dll build/bin/ 2>/dev/null || true
+        cp /c/Windows/System32/vcruntime140_1.dll build/bin/ 2>/dev/null || true
+
     - name: Running C++ Tests
       shell: bash
       run: |
@@ -109,12 +123,16 @@ jobs:
         export ASEPRITE=$PWD/build/bin/aseprite
         cd tests
         $XVFB bash run-tests.sh
+
+    # 👇 修改：上传时包含 DLL
     - name: Upload artifact (Windows)
       if: runner.os == 'Windows'
       uses: actions/upload-artifact@v4
       with:
         name: aseprite-windows-${{ matrix.build_type }}-${{ matrix.ui }}
-        path: build/bin/aseprite.exe
+        path: |
+          build/bin/aseprite.exe
+          build/bin/*.dll
 
     - name: Upload artifact (macOS)
       if: runner.os == 'macOS'
