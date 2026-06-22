@@ -109,3 +109,23 @@ jobs:
         export ASEPRITE=$PWD/build/bin/aseprite
         cd tests
         $XVFB bash run-tests.sh
+    - name: Upload artifact (Windows)
+      if: runner.os == 'Windows'
+      uses: actions/upload-artifact@v4
+      with:
+        name: aseprite-windows-${{ matrix.build_type }}-${{ matrix.ui }}
+        path: build/bin/aseprite.exe
+
+    - name: Upload artifact (macOS)
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v4
+      with:
+        name: aseprite-macos-${{ matrix.build_type }}-${{ matrix.ui }}
+        path: build/bin/aseprite
+
+    - name: Upload artifact (Linux)
+      if: runner.os == 'Linux'
+      uses: actions/upload-artifact@v4
+      with:
+        name: aseprite-linux-${{ matrix.build_type }}-${{ matrix.ui }}
+        path: build/bin/aseprite
